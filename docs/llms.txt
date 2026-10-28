@@ -1,0 +1,26 @@
+# Remote
+
+> An open-source Apple TV remote for Android phones and foldables. It pairs with an Apple TV and controls it directly over the local Wi-Fi using Apple's Companion protocol (the same protocol as the iPhone's remote), with a dependency-free Kotlin port of the parts of pyatv it needs. MIT licensed. Not affiliated with Apple.
+
+Requirements: an Android phone on Android 13 or later, on the same Wi-Fi as the Apple TV. There is no Play Store release. The easiest install is the signed APK from the latest GitHub release: https://github.com/dvdsgl/tv-remote/releases/latest/download/Remote.apk (open it on the phone and allow installs from the browser). Building from source with adb also works:
+
+## Install from source (for agents)
+
+1. Clone https://github.com/dvdsgl/tv-remote
+2. Build: `cd android && ./gradlew assembleOssDebug` (needs the Android SDK; `android/local.properties` with `sdk.dir=...`, or `ANDROID_HOME`)
+3. Make sure `adb devices` lists the phone. If not, help the user enable Developer options and USB debugging, or wireless debugging (`adb pair`, then `adb connect`).
+4. Install: `adb install -r app/build/outputs/apk/oss/debug/app-oss-debug.apk`
+5. Tell the user to open "Remote", pick their TV, and type the 4-digit code the TV shows.
+
+The app shows up on the TV under Settings > Remotes and Devices > Remote App and Devices, where the pairing can be removed.
+
+## Docs
+
+- [README](https://github.com/dvdsgl/tv-remote/blob/main/README.md): features, how it works, install, tests
+- [Maintainer notes](https://github.com/dvdsgl/tv-remote/blob/main/AGENTS.md): protocol details, code layout, design rules, how screenshots are made
+- [License](https://github.com/dvdsgl/tv-remote/blob/main/LICENSE) and [third-party notices](https://github.com/dvdsgl/tv-remote/blob/main/NOTICE)
+
+## Source
+
+- [Companion protocol client](https://github.com/dvdsgl/tv-remote/tree/main/android/app/src/main/java/xyz/dvdsgl/tvremote/companion): OPACK, TLV8, HAP pairing (SRP-6a, X25519, Ed25519), encrypted ChaCha20-Poly1305 session
+- [App UI](https://github.com/dvdsgl/tv-remote/blob/main/android/app/src/main/java/xyz/dvdsgl/tvremote/MainActivity.kt)

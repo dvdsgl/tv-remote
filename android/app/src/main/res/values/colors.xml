@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The launch splash matches the theme: white in light mode, black in dark (values-night). -->
+    <color name="splash">#FFFFFF</color>
+</resources>

@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Remote: Apple TV remote for Android</title>
+<meta name="description" content="A free, open-source Apple TV remote for Android, with no ads. It pairs with your TV and talks to it directly over Wi&#8209;Fi, the way the iPhone's remote does.">
+<link rel="canonical" href="https://dvdsgl.github.io/tv-remote/">
+<meta name="theme-color" content="#ffffff">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Remote">
+<meta property="og:url" content="https://dvdsgl.github.io/tv-remote/">
+<meta property="og:title" content="Remote: Apple TV remote for Android">
+<meta property="og:description" content="An open-source Apple TV remote for Android. It pairs with your TV and controls it over Wi&#8209;Fi.">
+<meta property="og:image" content="https://dvdsgl.github.io/tv-remote/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Remote on an Android phone and an unfolded foldable, next to the line: Droid, meet Lasso.">
+<meta property="og:video" content="https://dvdsgl.github.io/tv-remote/og.mp4">
+<meta property="og:video:secure_url" content="https://dvdsgl.github.io/tv-remote/og.mp4">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="1200">
+<meta property="og:video:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Remote: Apple TV remote for Android">
+<meta name="twitter:description" content="An open-source Apple TV remote for Android. It pairs with your TV and controls it over Wi&#8209;Fi.">
+<meta name="twitter:image" content="https://dvdsgl.github.io/tv-remote/og.png">
+<meta name="twitter:image:alt" content="Remote on an Android phone and an unfolded foldable, next to the line: Droid, meet Lasso.">
+
+<link rel="icon" href="icon.svg?v=1fe44487" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.png?v=a7640735">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
+<link rel="stylesheet" href="demo.css?v=3fcc8a46">
+<style>
+  @font-face { font-family: Inter; font-weight: 400; font-display: swap; src: url(fonts/inter_regular.ttf); }
+  @font-face { font-family: Inter; font-weight: 500; font-display: swap; src: url(fonts/inter_medium.ttf); }
+  @font-face { font-family: Inter; font-weight: 600; font-display: swap; src: url(fonts/inter_semibold.ttf); }
+  :root { --ink: #1d1d1f; --dim: #6e6e73; --band: #f5f5f7; --rule: #d2d2d7; --link: #0066cc; }
+  * { box-sizing: border-box; }
+  html { background: #fff; color: var(--ink); font: 400 17px/1.47 Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body { margin: 0; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  img { display: block; max-width: 100%; height: auto; }
+  .wrap { width: min(980px, 100% - 48px); margin: 0 auto; }
+
+  /* The hero fills one screen: phone and copy stacked (portrait) or side by side (landscape). */
+  .hero { min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 24px; padding: 20px 20px 28px; text-align: center; }
+  .hero .demo { --s: min(var(--sh), var(--sw)); }
+  .copy { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .github { background: #e8e8ed; color: var(--ink); padding: 13px 30px; border-radius: 980px; font-weight: 500; font-size: 17px; }
+  .github:hover { background: #dcdce1; text-decoration: none; }
+  h1 { font-size: clamp(34px, 9.5vw, 80px); line-height: 1.05; font-weight: 600; letter-spacing: -0.035em; margin: 0; }
+  .sub { font-size: clamp(19px, 4.6vw, 28px); line-height: 1.25; font-weight: 500; letter-spacing: -0.015em; color: var(--dim); margin: 8px 0 0; }
+  @media (orientation: landscape) {
+    .hero { flex-direction: row; gap: clamp(32px, 6vw, 96px); padding: 32px 40px; text-align: left; }
+    .copy { align-items: flex-start; gap: 32px; }
+    .actions { justify-content: flex-start; }
+    h1 { font-size: clamp(36px, 5vw, 84px); }
+  }
+  .download { background: var(--link); color: #fff; padding: 13px 30px; border-radius: 980px; font-weight: 500; font-size: 17px; }
+  .corner-download { position: fixed; z-index: 10; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+    background: var(--link); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+  .corner-download:hover { background: #0077ed; text-decoration: none; }
+  /* Side by side, Download is always in view. */
+  @media (orientation: landscape) { .corner-download { display: none; } }
+  .download:hover { background: #0077ed; text-decoration: none; }
+
+
+  .install h2 { font-size: 40px; line-height: 1.1; font-weight: 600; letter-spacing: -0.025em; margin: 0; }
+
+  .install { padding: 112px 0; }
+  .install .wrap { display: grid; grid-template-columns: 300px 1fr; gap: 56px; align-items: start; }
+  .install p { color: var(--dim); margin: 12px 0 0; }
+  .steps { margin: 0; padding-left: 1.2em; color: var(--ink); }
+  .steps li { margin: 0 0 10px; padding-left: 4px; }
+
+  footer { background: var(--band); border-top: 1px solid var(--rule); padding: 20px 0 28px; font-size: 13px; color: var(--dim); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  footer a { color: var(--dim); }
+
+  /* hero-sizes:start (generated by tools/hero_sizes.py) */
+  @media (orientation: portrait) and (max-width: 439px) {
+    .hero { --sh: .3; --sw: .3; }
+    @media (min-height: 360px) { .hero { --sh: 0.280; } }
+    @media (min-height: 380px) { .hero { --sh: 0.280; } }
+    @media (min-height: 400px) { .hero { --sh: 0.280; } }
+    @media (min-height: 420px) { .hero { --sh: 0.280; } }
+    @media (min-height: 440px) { .hero { --sh: 0.280; } }
+    @media (min-height: 460px) { .hero { --sh: 0.280; } }
+    @media (min-height: 480px) { .hero { --sh: 0.280; } }
+    @media (min-height: 500px) { .hero { --sh: 0.280; } }
+    @media (min-height: 520px) { .hero { --sh: 0.280; } }
+    @media (min-height: 540px) { .hero { --sh: 0.283; } }
+    @media (min-height: 560px) { .hero { --sh: 0.307; } }
+    @media (min-height: 580px) { .hero { --sh: 0.331; } }
+    @media (min-height: 600px) { .hero { --sh: 0.354; } }
+    @media (min-height: 620px) { .hero { --sh: 0.378; } }
+    @media (min-height: 640px) { .hero { --sh: 0.401; } }
+    @media (min-height: 660px) { .hero { --sh: 0.425; } }
+    @media (min-height: 680px) { .hero { --sh: 0.449; } }
+    @media (min-height: 700px) { .hero { --sh: 0.472; } }
+    @media (min-height: 720px) { .hero { --sh: 0.496; } }
+    @media (min-height: 740px) { .hero { --sh: 0.519; } }
+    @media (min-height: 760px) { .hero { --sh: 0.543; } }
+    @media (min-height: 780px) { .hero { --sh: 0.567; } }
+    @media (min-height: 800px) { .hero { --sh: 0.590; } }
+    @media (min-height: 820px) { .hero { --sh: 0.614; } }
+    @media (min-height: 840px) { .hero { --sh: 0.638; } }
+    @media (min-height: 860px) { .hero { --sh: 0.661; } }
+    @media (min-height: 880px) { .hero { --sh: 0.685; } }
+    @media (min-height: 900px) { .hero { --sh: 0.708; } }
+    @media (min-height: 920px) { .hero { --sh: 0.732; } }
+    @media (min-height: 940px) { .hero { --sh: 0.756; } }
+    @media (min-height: 960px) { .hero { --sh: 0.779; } }
+    @media (min-height: 980px) { .hero { --sh: 0.803; } }
+    @media (min-height: 1000px) { .hero { --sh: 0.826; } }
+    @media (min-height: 1020px) { .hero { --sh: 0.850; } }
+    @media (min-height: 1040px) { .hero { --sh: 0.874; } }
+    @media (min-height: 1060px) { .hero { --sh: 0.897; } }
+    @media (min-height: 1080px) { .hero { --sh: 0.921; } }
+    @media (min-height: 1100px) { .hero { --sh: 0.945; } }
+    @media (min-height: 1120px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1140px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1160px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1180px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1200px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1220px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1240px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1260px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1280px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1300px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1320px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1340px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1360px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1380px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1400px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1420px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1440px) { .hero { --sh: 0.950; } }
+    @media (min-width: 280px) { .hero { --sw: 0.542; } }
+    @media (min-width: 300px) { .hero { --sw: 0.581; } }
+    @media (min-width: 320px) { .hero { --sw: 0.619; } }
+    @media (min-width: 340px) { .hero { --sw: 0.658; } }
+    @media (min-width: 360px) { .hero { --sw: 0.697; } }
+    @media (min-width: 380px) { .hero { --sw: 0.735; } }
+    @media (min-width: 400px) { .hero { --sw: 0.774; } }
+    @media (min-width: 420px) { .hero { --sw: 0.813; } }
+  }
+  @media (orientation: portrait) and (min-width: 440px) and (max-width: 599px) {
+    .hero { --sh: .3; --sw: .3; }
+    @media (min-height: 360px) { .hero { --sh: 0.280; } }
+    @media (min-height: 380px) { .hero { --sh: 0.280; } }
+    @media (min-height: 400px) { .hero { --sh: 0.280; } }
+    @media (min-height: 420px) { .hero { --sh: 0.280; } }
+    @media (min-height: 440px) { .hero { --sh: 0.280; } }
+    @media (min-height: 460px) { .hero { --sh: 0.280; } }
+    @media (min-height: 480px) { .hero { --sh: 0.280; } }
+    @media (min-height: 500px) { .hero { --sh: 0.280; } }
+    @media (min-height: 520px) { .hero { --sh: 0.280; } }
+    @media (min-height: 540px) { .hero { --sh: 0.280; } }
+    @media (min-height: 560px) { .hero { --sh: 0.280; } }
+    @media (min-height: 580px) { .hero { --sh: 0.300; } }
+    @media (min-height: 600px) { .hero { --sh: 0.323; } }
+    @media (min-height: 620px) { .hero { --sh: 0.347; } }
+    @media (min-height: 640px) { .hero { --sh: 0.371; } }
+    @media (min-height: 660px) { .hero { --sh: 0.394; } }
+    @media (min-height: 680px) { .hero { --sh: 0.418; } }
+    @media (min-height: 700px) { .hero { --sh: 0.442; } }
+    @media (min-height: 720px) { .hero { --sh: 0.465; } }
+    @media (min-height: 740px) { .hero { --sh: 0.489; } }
+    @media (min-height: 760px) { .hero { --sh: 0.512; } }
+    @media (min-height: 780px) { .hero { --sh: 0.536; } }
+    @media (min-height: 800px) { .hero { --sh: 0.560; } }
+    @media (min-height: 820px) { .hero { --sh: 0.583; } }
+    @media (min-height: 840px) { .hero { --sh: 0.607; } }
+    @media (min-height: 860px) { .hero { --sh: 0.630; } }
+    @media (min-height: 880px) { .hero { --sh: 0.654; } }
+    @media (min-height: 900px) { .hero { --sh: 0.678; } }
+    @media (min-height: 920px) { .hero { --sh: 0.701; } }
+    @media (min-height: 940px) { .hero { --sh: 0.725; } }
+    @media (min-height: 960px) { .hero { --sh: 0.749; } }
+    @media (min-height: 980px) { .hero { --sh: 0.772; } }
+    @media (min-height: 1000px) { .hero { --sh: 0.796; } }
+    @media (min-height: 1020px) { .hero { --sh: 0.819; } }
+    @media (min-height: 1040px) { .hero { --sh: 0.843; } }
+    @media (min-height: 1060px) { .hero { --sh: 0.867; } }
+    @media (min-height: 1080px) { .hero { --sh: 0.890; } }
+    @media (min-height: 1100px) { .hero { --sh: 0.914; } }
+    @media (min-height: 1120px) { .hero { --sh: 0.937; } }
+    @media (min-height: 1140px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1160px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1180px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1200px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1220px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1240px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1260px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1280px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1300px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1320px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1340px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1360px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1380px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1400px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1420px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1440px) { .hero { --sh: 0.950; } }
+    @media (min-width: 440px) { .hero { --sw: 0.852; } }
+    @media (min-width: 460px) { .hero { --sw: 0.890; } }
+    @media (min-width: 480px) { .hero { --sw: 0.929; } }
+    @media (min-width: 500px) { .hero { --sw: 0.950; } }
+    @media (min-width: 520px) { .hero { --sw: 0.950; } }
+    @media (min-width: 540px) { .hero { --sw: 0.950; } }
+    @media (min-width: 560px) { .hero { --sw: 0.950; } }
+    @media (min-width: 580px) { .hero { --sw: 0.950; } }
+  }
+  @media (orientation: portrait) and (min-width: 600px) {
+    .hero { --sh: .3; --sw: .3; }
+    @media (min-height: 360px) { .hero { --sh: 0.280; } }
+    @media (min-height: 380px) { .hero { --sh: 0.280; } }
+    @media (min-height: 400px) { .hero { --sh: 0.280; } }
+    @media (min-height: 420px) { .hero { --sh: 0.280; } }
+    @media (min-height: 440px) { .hero { --sh: 0.280; } }
+    @media (min-height: 460px) { .hero { --sh: 0.280; } }
+    @media (min-height: 480px) { .hero { --sh: 0.280; } }
+    @media (min-height: 500px) { .hero { --sh: 0.280; } }
+    @media (min-height: 520px) { .hero { --sh: 0.280; } }
+    @media (min-height: 540px) { .hero { --sh: 0.280; } }
+    @media (min-height: 560px) { .hero { --sh: 0.280; } }
+    @media (min-height: 580px) { .hero { --sh: 0.280; } }
+    @media (min-height: 600px) { .hero { --sh: 0.280; } }
+    @media (min-height: 620px) { .hero { --sh: 0.295; } }
+    @media (min-height: 640px) { .hero { --sh: 0.319; } }
+    @media (min-height: 660px) { .hero { --sh: 0.342; } }
+    @media (min-height: 680px) { .hero { --sh: 0.366; } }
+    @media (min-height: 700px) { .hero { --sh: 0.390; } }
+    @media (min-height: 720px) { .hero { --sh: 0.413; } }
+    @media (min-height: 740px) { .hero { --sh: 0.437; } }
+    @media (min-height: 760px) { .hero { --sh: 0.460; } }
+    @media (min-height: 780px) { .hero { --sh: 0.484; } }
+    @media (min-height: 800px) { .hero { --sh: 0.508; } }
+    @media (min-height: 820px) { .hero { --sh: 0.531; } }
+    @media (min-height: 840px) { .hero { --sh: 0.555; } }
+    @media (min-height: 860px) { .hero { --sh: 0.579; } }
+    @media (min-height: 880px) { .hero { --sh: 0.602; } }
+    @media (min-height: 900px) { .hero { --sh: 0.626; } }
+    @media (min-height: 920px) { .hero { --sh: 0.649; } }
+    @media (min-height: 940px) { .hero { --sh: 0.673; } }
+    @media (min-height: 960px) { .hero { --sh: 0.697; } }
+    @media (min-height: 980px) { .hero { --sh: 0.720; } }
+    @media (min-height: 1000px) { .hero { --sh: 0.744; } }
+    @media (min-height: 1020px) { .hero { --sh: 0.767; } }
+    @media (min-height: 1040px) { .hero { --sh: 0.791; } }
+    @media (min-height: 1060px) { .hero { --sh: 0.815; } }
+    @media (min-height: 1080px) { .hero { --sh: 0.838; } }
+    @media (min-height: 1100px) { .hero { --sh: 0.862; } }
+    @media (min-height: 1120px) { .hero { --sh: 0.885; } }
+    @media (min-height: 1140px) { .hero { --sh: 0.909; } }
+    @media (min-height: 1160px) { .hero { --sh: 0.933; } }
+    @media (min-height: 1180px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1200px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1220px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1240px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1260px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1280px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1300px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1320px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1340px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1360px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1380px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1400px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1420px) { .hero { --sh: 0.950; } }
+    @media (min-height: 1440px) { .hero { --sh: 0.950; } }
+    @media (min-width: 600px) { .hero { --sw: 0.857; } }
+    @media (min-width: 620px) { .hero { --sw: 0.886; } }
+    @media (min-width: 640px) { .hero { --sw: 0.914; } }
+    @media (min-width: 660px) { .hero { --sw: 0.943; } }
+    @media (min-width: 680px) { .hero { --sw: 0.950; } }
+    @media (min-width: 700px) { .hero { --sw: 0.950; } }
+    @media (min-width: 720px) { .hero { --sw: 0.950; } }
+    @media (min-width: 740px) { .hero { --sw: 0.950; } }
+    @media (min-width: 760px) { .hero { --sw: 0.950; } }
+    @media (min-width: 780px) { .hero { --sw: 0.950; } }
+    @media (min-width: 800px) { .hero { --sw: 0.950; } }
+    @media (min-width: 820px) { .hero { --sw: 0.950; } }
+    @media (min-width: 840px) { .hero { --sw: 0.950; } }
+    @media (min-width: 860px) { .hero { --sw: 0.950; } }
+    @media (min-width: 880px) { .hero { --sw: 0.950; } }
+    @media (min-width: 900px) { .hero { --sw: 0.950; } }
+    @media (min-width: 920px) { .hero { --sw: 0.950; } }
+    @media (min-width: 940px) { .hero { --sw: 0.950; } }
+    @media (min-width: 960px) { .hero { --sw: 0.950; } }
+    @media (min-width: 980px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1000px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1020px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1040px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1060px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1080px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1100px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1120px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1140px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1160px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1180px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1200px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1220px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1240px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1260px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1280px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1300px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1320px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1340px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1360px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1380px) { .hero { --sw: 0.950; } }
+    @media (min-width: 1400px) { .hero { --sw: 0.950; } }
+  }
+  @media (orientation: landscape) {
+    .hero { --sh: .3; --sw: .3; }
+    @media (min-height: 360px) { .hero { --sh: 0.349; } }
+    @media (min-height: 380px) { .hero { --sh: 0.373; } }
+    @media (min-height: 400px) { .hero { --sh: 0.397; } }
+    @media (min-height: 420px) { .hero { --sh: 0.420; } }
+    @media (min-height: 440px) { .hero { --sh: 0.444; } }
+    @media (min-height: 460px) { .hero { --sh: 0.468; } }
+    @media (min-height: 480px) { .hero { --sh: 0.491; } }
+    @media (min-height: 500px) { .hero { --sh: 0.515; } }
+    @media (min-height: 520px) { .hero { --sh: 0.538; } }
+    @media (min-height: 540px) { .hero { --sh: 0.562; } }
+    @media (min-height: 560px) { .hero { --sh: 0.586; } }
+    @media (min-height: 580px) { .hero { --sh: 0.609; } }
+    @media (min-height: 600px) { .hero { --sh: 0.633; } }
+    @media (min-height: 620px) { .hero { --sh: 0.656; } }
+    @media (min-height: 640px) { .hero { --sh: 0.680; } }
+    @media (min-height: 660px) { .hero { --sh: 0.704; } }
+    @media (min-height: 680px) { .hero { --sh: 0.727; } }
+    @media (min-height: 700px) { .hero { --sh: 0.751; } }
+    @media (min-height: 720px) { .hero { --sh: 0.774; } }
+    @media (min-height: 740px) { .hero { --sh: 0.798; } }
+    @media (min-height: 760px) { .hero { --sh: 0.822; } }
+    @media (min-height: 780px) { .hero { --sh: 0.845; } }
+    @media (min-height: 800px) { .hero { --sh: 0.869; } }
+    @media (min-height: 820px) { .hero { --sh: 0.893; } }
+    @media (min-height: 840px) { .hero { --sh: 0.900; } }
+    @media (min-height: 860px) { .hero { --sh: 0.900; } }
+    @media (min-height: 880px) { .hero { --sh: 0.900; } }
+    @media (min-height: 900px) { .hero { --sh: 0.900; } }
+    @media (min-height: 920px) { .hero { --sh: 0.900; } }
+    @media (min-height: 940px) { .hero { --sh: 0.900; } }
+    @media (min-height: 960px) { .hero { --sh: 0.900; } }
+    @media (min-height: 980px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1000px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1020px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1040px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1060px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1080px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1100px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1120px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1140px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1160px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1180px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1200px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1220px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1240px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1260px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1280px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1300px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1320px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1340px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1360px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1380px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1400px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1420px) { .hero { --sh: 0.900; } }
+    @media (min-height: 1440px) { .hero { --sh: 0.900; } }
+    @media (min-width: 480px) { .hero { --sw: 0.442; } }
+    @media (min-width: 500px) { .hero { --sw: 0.461; } }
+    @media (min-width: 520px) { .hero { --sw: 0.479; } }
+    @media (min-width: 540px) { .hero { --sw: 0.498; } }
+    @media (min-width: 560px) { .hero { --sw: 0.516; } }
+    @media (min-width: 580px) { .hero { --sw: 0.535; } }
+    @media (min-width: 600px) { .hero { --sw: 0.553; } }
+    @media (min-width: 620px) { .hero { --sw: 0.571; } }
+    @media (min-width: 640px) { .hero { --sw: 0.590; } }
+    @media (min-width: 660px) { .hero { --sw: 0.608; } }
+    @media (min-width: 680px) { .hero { --sw: 0.627; } }
+    @media (min-width: 700px) { .hero { --sw: 0.645; } }
+    @media (min-width: 720px) { .hero { --sw: 0.664; } }
+    @media (min-width: 740px) { .hero { --sw: 0.682; } }
+    @media (min-width: 760px) { .hero { --sw: 0.700; } }
+    @media (min-width: 780px) { .hero { --sw: 0.719; } }
+    @media (min-width: 800px) { .hero { --sw: 0.737; } }
+    @media (min-width: 820px) { .hero { --sw: 0.756; } }
+    @media (min-width: 840px) { .hero { --sw: 0.774; } }
+    @media (min-width: 860px) { .hero { --sw: 0.793; } }
+    @media (min-width: 880px) { .hero { --sw: 0.811; } }
+    @media (min-width: 900px) { .hero { --sw: 0.829; } }
+    @media (min-width: 920px) { .hero { --sw: 0.848; } }
+    @media (min-width: 940px) { .hero { --sw: 0.866; } }
+    @media (min-width: 960px) { .hero { --sw: 0.885; } }
+    @media (min-width: 980px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1000px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1020px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1040px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1060px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1080px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1100px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1120px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1140px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1160px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1180px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1200px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1220px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1240px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1260px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1280px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1300px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1320px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1340px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1360px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1380px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1400px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1420px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1440px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1460px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1480px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1500px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1520px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1540px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1560px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1580px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1600px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1620px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1640px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1660px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1680px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1700px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1720px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1740px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1760px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1780px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1800px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1820px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1840px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1860px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1880px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1900px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1920px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1940px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1960px) { .hero { --sw: 0.900; } }
+    @media (min-width: 1980px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2000px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2020px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2040px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2060px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2080px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2100px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2120px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2140px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2160px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2180px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2200px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2220px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2240px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2260px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2280px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2300px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2320px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2340px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2360px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2380px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2400px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2420px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2440px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2460px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2480px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2500px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2520px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2540px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2560px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2580px) { .hero { --sw: 0.900; } }
+    @media (min-width: 2600px) { .hero { --sw: 0.900; } }
+  }
+  /* hero-sizes:end */
+  @media (max-width: 860px) {
+          .install h2 { font-size: 32px; }
+        .install { padding: 72px 0; }
+    .install .wrap { grid-template-columns: 1fr; gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="corner-download" href="https://github.com/dvdsgl/tv-remote/releases/latest/download/Remote.apk" aria-label="Download Remote.apk" title="Download"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v14M6 12l6 6 6-6"/></svg></a>
+
+<header class="hero">
+  <div class="stage">
+    <div class="demo" role="img" aria-label="Remote on an Android phone: open it from the home screen, choose your Apple TV, type the code the TV shows, and swipe on the touch surface. Later, open it again from its Quick Settings tile.">
+      <div class="key" style="top:20%;height:5%"></div><div class="key" style="top:29%;height:11%"></div>
+      <div class="viewport"><div class="scene" aria-hidden="true">
+        <div class="bar"><span>9:41</span><span><svg width="15" height="15" viewBox="0 0 24 24"><path d="M12 20.5 1 8.4a16.2 16.2 0 0 1 22 0z"/></svg><svg width="14" height="14" viewBox="0 0 24 24"><path d="M21.5 2.5v19h-19z"/></svg><svg width="15" height="15" viewBox="0 0 24 24"><rect x="10" y="1.5" width="4" height="2.2" rx=".6"/><rect x="7" y="3" width="10" height="19" rx="2"/></svg></span></div>
+        <div class="abs home"><div class="abs clock">9:41</div><div class="abs date">Wednesday, October 28</div><div class="slot-ic" style="left:35.75px;top:540px"><div class="app-ic" style="background:#D3E3FD"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0B305E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg></div><b>Clock</b></div><div class="slot-ic" style="left:127.25px;top:540px"><div class="app-ic" style="background:#EADDFF"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3B2471" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg></div><b>Calendar</b></div><div class="slot-ic" style="left:218.75px;top:540px"><div class="app-ic remote-ic"><i></i><em><s></s><u></u></em></div><b>Remote</b></div><div class="slot-ic" style="left:310.25px;top:540px"><div class="app-ic" style="background:#C4EED0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0F3D22" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg></div><b>Files</b></div><div class="slot-ic" style="left:35.75px;top:646px"><div class="app-ic" style="background:#C4EED0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0F3D22" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 4h3l1.5 4-2 1.5a10 10 0 0 0 5.5 5.5l1.5-2 4 1.5v3a2 2 0 0 1-2 2A15 15 0 0 1 4.5 6a2 2 0 0 1 2-2z"/></svg></div></div><div class="slot-ic" style="left:127.25px;top:646px"><div class="app-ic" style="background:#D3E3FD"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0B305E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-4 3v-3h.5a2 2 0 0 1-2-2z"/></svg></div></div><div class="slot-ic" style="left:218.75px;top:646px"><div class="app-ic" style="background:#FFDBCB"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5A2A12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4a12 12 0 0 1 0 16M12 4a12 12 0 0 0 0 16"/></svg></div></div><div class="slot-ic" style="left:310.25px;top:646px"><div class="app-ic" style="background:#EADDFF"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3B2471" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"/><circle cx="12" cy="12.5" r="3.3"/><path d="M8.5 6.5 10 4.5h4l1.5 2"/></svg></div></div>
+          <div class="abs search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>Search</div></div>
+        <div class="abs qs-scrim"></div>
+        <div class="abs qs"><div class="bright"><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg></i></div>
+          <div class="tiles"><div class="tile on"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 20.5 1.5 8.7a15.5 15.5 0 0 1 21 0z"/></svg>Internet</div>
+            <div class="tile on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10-5 4.5V2.5L17 7 7 17"/></svg>Bluetooth</div>
+            <div class="tile remote"><svg width="22" height="22" viewBox="0 0 24 24" fill="#1f1f1f"><path d="M8 2h8a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z"/><circle cx="6.6" cy="20.5" r="1.6"/><circle cx="10.2" cy="20.5" r="1.6"/><circle cx="13.8" cy="20.5" r="1.6"/><circle cx="17.4" cy="20.5" r="1.6"/></svg><div>Remote<small>Living Room</small></div></div>
+            <div class="tile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f1f1f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5h8l-1.5 6H9.5zM9.5 8.5h5v12a1.5 1.5 0 0 1-1.5 1.5h-2a1.5 1.5 0 0 1-1.5-1.5z"/></svg>Flashlight</div></div>
+          <div class="grip"></div></div>
+        <div class="abs app">
+          <div class="abs name a">Choose TV<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5 8 10l3.5-3.5" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="abs name b">Living Room<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5 8 10l3.5-3.5" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="abs mode"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></div>
+          <div class="abs power"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg></div>
+          <div class="abs surface"><div class="abs glow"></div></div>
+          <div class="abs btn" style="left:28px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></div><div class="abs btn" style="left:120.67px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M9 20.5h6"/></svg></div><div class="abs btn" style="left:213.33px"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M4 6.2v11.6c0 .7.8 1.2 1.4.8l8.6-5.8a1 1 0 0 0 0-1.6L5.4 5.4C4.8 5 4 5.5 4 6.2z"/><rect x="15.5" y="5.5" width="2.2" height="13" rx="1"/><rect x="19.3" y="5.5" width="2.2" height="13" rx="1"/></svg></div><div class="abs btn" style="left:306px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a3 3 0 0 1 3 3V12a3 3 0 0 1-6 0V6.5a3 3 0 0 1 3-3z"/><path d="M6 11.5a6 6 0 0 0 12 0M12 17.5v3"/></svg></div>
+          <div class="abs scrim"></div>
+          <div class="abs sheet"><div class="grab"></div><h3>Choose a TV</h3>
+            <div class="row press"><div class="tvic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M9 20.5h6"/></svg></div><div><b>Living Room</b><small>Apple TV 4K · Not paired</small></div></div>
+            <div class="row"><div class="tvic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M9 20.5h6"/></svg></div><div><b>Bedroom</b><small>Apple TV HD · Not paired</small></div></div></div>
+          <div class="abs pair"><div class="abs cancel">Cancel</div><div class="abs title">Enter code</div>
+            <div class="abs msg a">Shown on Living Room</div><div class="abs msg b">Pairing</div>
+            <div class="abs slot" style="left:71px"><span style="animation:d-d1 var(--t) infinite">3</span></div><div class="abs slot" style="left:139px"><span style="animation:d-d2 var(--t) infinite">8</span></div><div class="abs slot" style="left:207px"><span style="animation:d-d3 var(--t) infinite">1</span></div><div class="abs slot" style="left:275px"><span style="animation:d-d4 var(--t) infinite">5</span></div><div class="abs ring"></div><div class="abs k" style="left:56px;top:413px;animation:d-k3 var(--t) infinite">1</div><div class="abs k" style="left:162px;top:413px">2</div><div class="abs k" style="left:268px;top:413px;animation:d-k1 var(--t) infinite">3</div><div class="abs k" style="left:56px;top:507px">4</div><div class="abs k" style="left:162px;top:507px;animation:d-k4 var(--t) infinite">5</div><div class="abs k" style="left:268px;top:507px">6</div><div class="abs k" style="left:56px;top:601px">7</div><div class="abs k" style="left:162px;top:601px;animation:d-k2 var(--t) infinite">8</div><div class="abs k" style="left:268px;top:601px">9</div><div class="abs k" style="left:162px;top:695px">0</div><div class="abs" style="left:268px;top:695px;width:78px;height:78px;display:flex;align-items:center;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5.5h10a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9L3 12z"/><path d="M11.5 9.5l5 5M16.5 9.5l-5 5"/></svg></div></div>
+        </div>
+        <div class="abs finger"></div><div class="abs handle"></div><div class="cam"></div>
+      </div></div>
+    </div>
+  </div>
+  <div class="copy">
+    <div class="titles"><h1>Droid, meet Lasso.</h1><p class="sub">Apple TV remote for Android.<br>Free, with no ads.</p></div>
+    <div class="actions"><a class="download" href="https://github.com/dvdsgl/tv-remote/releases/latest/download/Remote.apk">Download</a>
+      <a class="github" href="https://github.com/dvdsgl/tv-remote">GitHub</a></div>
+  </div>
+</header>
+
+<section class="install" id="install">
+  <div class="wrap">
+    <div><h2>Install</h2><p>On the same Wi&#8209;Fi as the Apple TV.</p></div>
+    <div>
+      <ol class="steps">
+        <li>On your phone, <a href="https://github.com/dvdsgl/tv-remote/releases/latest/download/Remote.apk">download Remote.apk</a> and open it. Android will ask you to allow installs from your browser the first time.</li>
+        <li>Open Remote, pick your TV, and type the code the TV shows.</li>
+        <li>Optional: add the Remote tile to Quick Settings, the panel you pull down from the top of the screen, to open it in one tap. Remote offers to add it after you connect.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap"><span>Protocol ported from <a href="https://github.com/postlund/pyatv">pyatv</a>. Not affiliated with Apple. Apple TV is a trademark of Apple Inc.</span><span><a href="https://github.com/dvdsgl/tv-remote/blob/main/LICENSE">MIT License</a> · <a href="https://github.com/dvdsgl/tv-remote">GitHub</a></span></div></footer>
+</body>
+</html>

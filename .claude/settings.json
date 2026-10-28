@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_paper-desktop_paper__get_screenshot",
+      "Bash(adb shell dumpsys *)",
+      "Bash(adb -s * shell dumpsys *)",
+      "Bash(adb logcat -d *)",
+      "Bash(adb -s * logcat -d *)",
+      "mcp__plugin_paper-desktop_paper__get_node_info",
+      "Bash(journalctl --user *)",
+      "Bash(systemctl --user is-active *)",
+      "Bash(adb shell pm list *)",
+      "Bash(adb -s * shell pm list *)",
+      "mcp__t3-code__preview_snapshot",
+      "mcp__plugin_paper-desktop_paper__find_nodes",
+      "Bash(magick identify *)",
+      "mcp__plugin_paper-desktop_paper__get_tree_summary",
+      "Bash(adb shell getprop *)",
+      "Bash(adb -s * shell getprop *)",
+      "Bash(desk ls *)",
+      "Bash(desk ls)",
+      "mcp__claude-in-chrome__get_page_text",
+      "mcp__claude_ai_Gmail__search_threads",
+      "mcp__claude-in-chrome__find",
+      "Bash(adb devices *)",
+      "Bash(adb devices)",
+      "Bash(pacman -Q *)",
+      "Bash(ffprobe *)",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "mcp__plugin_paper-desktop_paper__get_computed_styles",
+      "mcp__plugin_paper-desktop_paper__get_guide",
+      "mcp__plugin_paper-desktop_paper__get_jsx",
+      "mcp__plugin_paper-desktop_paper__get_basic_info",
+      "Bash(systemctl --user status *)",
+      "Bash(systemctl --user list-timers *)",
+      "Bash(systemctl --user list-timers)",
+      "Bash(adb mdns services)"
+    ]
+  }
+}

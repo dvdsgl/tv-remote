@@ -1,0 +1,8 @@
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.apk
+__pycache__/
+AGENTS.local.md
+.claude/settings.local.json

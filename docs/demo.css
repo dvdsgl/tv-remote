@@ -1,0 +1,330 @@
+/*
+ * The hero animation: a 14 s loop on a phone, designed in Paper ("Hero anim" frames).
+ * Home screen, tap Remote; the app opens; choose a TV; type the code; swipe and tap. Then
+ * back home, pull down Quick Settings and open the remote again from its tile.
+ * Everything is laid out in a 402x820 space (a 20:9-ish Pixel screen) and scaled to --w.
+ * All animations share one 20 s duration. The keyframes are generated from a timeline in
+ * seconds by tools/hero_keyframes.py; edit that and paste its output here.
+ */
+/* A Pixel-style phone: flat metal rail, gentle corners, thin even bezel that scales with
+   the phone (11px at full size, --s .82), power key above a long volume rocker. */
+.demo { --s: .82; --w: calc(402px * var(--s)); --b: calc(13.4px * var(--s)); --t: 20s; position: relative;
+  width: calc(var(--w) + 2 * var(--b)); margin: 0 auto; padding: var(--b); border-radius: calc(var(--w) * .12);
+  background: #0d0d0e;
+  box-shadow: inset 0 0 0 calc(2px * var(--s)) #6b6b70, inset 0 0 0 calc(3.5px * var(--s)) #2a2a2d,
+    0 30px 60px -20px rgba(0,0,0,.35); }
+.demo .key { position: absolute; right: calc(-4px * var(--s)); width: calc(4px * var(--s)); border-radius: 0 2px 2px 0;
+  background: linear-gradient(90deg, #3a3a3e, #7a7a80); }
+.demo .viewport { position: relative; width: var(--w); height: calc(var(--w) * 820 / 402); border-radius: calc(var(--w) * .085);
+  overflow: hidden; background: #000; isolation: isolate; transform: translateZ(0); }
+.demo .scene { position: absolute; left: 0; top: 0; width: 402px; height: 820px; transform: scale(var(--s));
+  transform-origin: 0 0; font-family: Inter, system-ui, sans-serif; color: #fff; text-align: left; }
+.demo .scene * { box-sizing: border-box; }
+.demo .abs { position: absolute; }
+.demo .cam { position: absolute; z-index: 9; top: 12px; left: 195px; width: 12px; height: 12px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #1b2030, #050506 60%); }
+
+/* Shared status bar */
+.demo .bar { position: absolute; z-index: 8; color: #1f1f1f; animation: d-bar var(--t) infinite; left: 0; top: 0; width: 402px; height: 44px; display: flex; align-items: center;
+  justify-content: space-between; padding: 2px 24px 0 26px; font-size: 14px; font-weight: 500; letter-spacing: .01em; }
+.demo .bar svg { display: block; }
+.demo .bar svg { fill: currentColor; }
+.demo .bar span:last-child { display: flex; gap: 5px; align-items: center; }
+
+/* Home screen */
+.demo .home { inset: 0; color: #fff;
+  /* A rich sunset mesh: gold, coral and magenta into violet and deep indigo. */
+  background:
+    radial-gradient(70% 45% at 8% 6%, #ffc76b 0%, rgba(255,199,107,0) 70%),
+    radial-gradient(60% 45% at 95% 22%, #ff5f8f 0%, rgba(255,95,143,0) 72%),
+    radial-gradient(75% 55% at 30% 55%, #c23ec9 0%, rgba(194,62,201,0) 72%),
+    radial-gradient(70% 50% at 85% 75%, #6a3cf0 0%, rgba(106,60,240,0) 72%),
+    radial-gradient(60% 40% at 15% 100%, #2b2fb8 0%, rgba(43,47,184,0) 75%),
+    linear-gradient(170deg, #ff8a5b 0%, #e2457f 35%, #8b3ad6 65%, #2a2780 100%);
+}
+.demo .clock { left: 28px; top: 100px; font-size: 64px; font-weight: 400; color: #fff; text-shadow: 0 1px 12px rgba(0,0,0,.18); letter-spacing: -0.03em; line-height: 68px; }
+.demo .date { left: 28px; top: 172px; font-size: 16px; color: rgba(255,255,255,.88); text-shadow: 0 1px 8px rgba(0,0,0,.18); }
+.demo .app-ic { width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
+.demo .app-ic + b { position: absolute; top: 64px; left: 50%; transform: translateX(-50%); font-size: 12px; font-weight: 500; white-space: nowrap; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.35); }
+.demo .slot-ic { position: absolute; width: 56px; height: 56px; }
+.demo .remote-ic { background: linear-gradient(180deg, #2a2a2d, #111113); box-shadow: 0 0 0 1px rgba(255,255,255,.18), 0 4px 12px rgba(0,0,0,.25); flex-direction: column; gap: 4px; }
+.demo .remote-ic i { display: block; width: 22px; height: 23px; border-radius: 5px; background: #3e3e42; }
+.demo .remote-ic em { display: flex; gap: 2px; }
+.demo .remote-ic em::before, .demo .remote-ic em::after, .demo .remote-ic em s, .demo .remote-ic em u {
+  content: ""; display: block; width: 4.5px; height: 4.5px; border-radius: 3px; background: #5e5e64; }
+.demo .search { left: 18px; top: 724px; width: 366px; height: 52px; border-radius: 26px; background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; align-items: center; gap: 12px; padding: 0 20px; font-size: 15px; color: #5f6368; }
+.demo .handle { left: 161px; top: 806px; width: 80px; height: 3px; border-radius: 2px; background: #fff; z-index: 8; }
+
+/* The app: remote underneath, opening from the icon */
+.demo .app { inset: 0; background: #000; animation: d-app var(--t) infinite; }
+.demo .home { transform-origin: 50% 50%; }
+.demo .name { left: 0; width: 402px; top: 64px; text-align: center; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.demo .name svg { vertical-align: -2px; margin-left: 4px; }
+.demo .name.a { animation: d-name-a var(--t) infinite; }
+.demo .name.b { opacity: 0; animation: d-name-b var(--t) infinite; }
+.demo .power { left: 347px; top: 63px; }
+.demo .surface { left: 20px; top: 120px; width: 362px; height: 552px; border-radius: 32px; background: #1c1c1e; overflow: hidden; }
+.demo .glow { width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, rgba(255,255,255,.2) 0%, rgba(255,255,255,0) 70%); animation: d-glow var(--t) infinite; }
+.demo .btn { top: 700px; width: 68px; height: 68px; border-radius: 34px; background: #2c2c2e; display: flex; align-items: center; justify-content: center; }
+
+/* TV picker: a floating card */
+.demo .scrim { inset: 0; background: #000; opacity: 0; animation: d-scrim var(--t) infinite; }
+.demo .sheet { left: 10px; width: 382px; bottom: 34px; border-radius: 28px; background: #1c1c1e; padding: 10px 0 14px;
+  transform: translateY(120%); animation: d-sheet var(--t) infinite; }
+.demo .sheet .grab { width: 36px; height: 5px; border-radius: 3px; background: #48484a; margin: 0 auto 14px; }
+.demo .sheet h3 { margin: 0; padding: 4px 24px 12px; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.demo .row { position: relative; display: flex; align-items: center; gap: 14px; padding: 12px 24px; }
+.demo .row.press { animation: d-row var(--t) infinite; }
+.demo .row .tvic { width: 44px; height: 44px; border-radius: 22px; background: #2c2c2e; display: flex; align-items: center; justify-content: center; }
+.demo .row b { display: block; font-size: 17px; font-weight: 500; }
+.demo .row small { display: block; font-size: 14px; color: #8e8e93; margin-top: 3px; }
+
+/* Pairing */
+.demo .pair { inset: 0; background: #000; transform: translateY(100%); animation: d-pair var(--t) infinite; }
+.demo .cancel { left: 20px; top: 59px; font-size: 17px; color: #0a84ff; }
+.demo .title { left: 0; width: 402px; top: 152px; text-align: center; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+.demo .msg { left: 0; width: 402px; top: 194px; text-align: center; font-size: 15px; color: #8e8e93; }
+.demo .msg.b { opacity: 0; animation: d-msg-b var(--t) infinite; }
+.demo .msg.a { animation: d-msg-a var(--t) infinite; }
+.demo .slot { top: 227px; width: 56px; height: 68px; border-radius: 14px; background: #1c1c1e; display: flex; align-items: center;
+  justify-content: center; font-size: 32px; font-weight: 600; }
+.demo .slot span { opacity: 0; }
+.demo .ring { top: 227px; left: 71px; width: 56px; height: 68px; border-radius: 14px; box-shadow: inset 0 0 0 2px #0a84ff;
+  animation: d-ring var(--t) infinite; }
+.demo .k { width: 78px; height: 78px; border-radius: 39px; background: #2c2c2e; display: flex; align-items: center;
+  justify-content: center; font-size: 34px; }
+
+/* Quick Settings (light, Material) */
+.demo .qs-scrim { inset: 0; background: rgba(0,0,0,.25); opacity: 0; animation: d-qs-scrim var(--t) infinite; }
+.demo .qs { left: 0; top: 0; width: 402px; padding: 48px 16px 22px; background: #f3f4f8; border-radius: 0 0 28px 28px;
+  display: flex; flex-direction: column; gap: 14px; color: #1f1f1f; transform: translateY(-105%); animation: d-qs var(--t) infinite; }
+.demo .qs .bright { height: 44px; border-radius: 22px; background: #dde3ea; }
+.demo .qs .bright i { display: flex; align-items: center; width: 62%; height: 44px; border-radius: 22px; background: #0b57d0; padding-left: 16px; }
+.demo .qs .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; }
+.demo .qs .tile { height: 64px; border-radius: 32px; background: #e1e3e8; display: flex; align-items: center; gap: 12px; padding: 0 18px;
+  font-size: 15px; font-weight: 600; }
+.demo .qs .tile.on { background: #0b57d0; color: #fff; }
+.demo .qs .tile.remote { animation: d-tile var(--t) infinite; }
+.demo .qs .tile small { display: block; font-size: 12px; font-weight: 400; color: #444746; }
+.demo .qs .grip { width: 36px; height: 4px; border-radius: 2px; background: #c4c7cc; margin: 2px auto 0; }
+
+/* Finger */
+.demo .finger { z-index: 7; width: 44px; height: 44px; border-radius: 22px; background: rgba(120,120,126,.45);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.85), 0 2px 10px rgba(0,0,0,.25); opacity: 0; animation: d-finger var(--t) infinite; }
+
+@keyframes d-home {
+  0.00%, 6.25% { transform: scale(1); }
+  8.75%, 56.50% { transform: scale(.94); }
+  59.00%, 71.75% { transform: scale(1); }
+  74.25%, 87.50% { transform: scale(.94); }
+  90.00%, 100.00% { transform: scale(1); }
+}
+@keyframes d-app {
+  0.00%, 6.25% { opacity: 0; clip-path: inset(540px 128px 224px 218px round 28px); }
+  6.50% { opacity: 1; clip-path: inset(540px 128px 224px 218px round 28px); }
+  8.75%, 56.50% { opacity: 1; clip-path: inset(0px 0px 0px 0px round 0px); }
+  58.75% { opacity: 1; clip-path: inset(540px 128px 224px 218px round 28px); }
+  59.00%, 71.75% { opacity: 0; clip-path: inset(540px 128px 224px 218px round 28px); }
+  71.80% { opacity: 0; clip-path: inset(184px 207px 572px 16px round 32px); }
+  72.00% { opacity: 1; clip-path: inset(184px 207px 572px 16px round 32px); }
+  74.25%, 87.50% { opacity: 1; clip-path: inset(0px 0px 0px 0px round 0px); }
+  89.75% { opacity: 1; clip-path: inset(540px 128px 224px 218px round 28px); }
+  90.00%, 100.00% { opacity: 0; clip-path: inset(540px 128px 224px 218px round 28px); }
+}
+@keyframes d-name-a {
+  0.00%, 33.95% { opacity: 1; }
+  34.00%, 100.00% { opacity: 0; }
+}
+@keyframes d-name-b {
+  0.00%, 33.95% { opacity: 0; }
+  34.00%, 99.50% { opacity: 1; }
+  100.00% { opacity: 0; }
+}
+@keyframes d-scrim {
+  0.00%, 9.00% { opacity: 0; }
+  11.50%, 17.00% { opacity: .6; }
+  19.50%, 100.00% { opacity: 0; }
+}
+@keyframes d-sheet {
+  0.00%, 9.00% { transform: translateY(120%); }
+  11.50%, 17.00% { transform: translateY(0); }
+  19.50%, 100.00% { transform: translateY(120%); }
+}
+@keyframes d-row {
+  0.00%, 15.70% { background: transparent; }
+  16.00%, 16.60% { background: #2c2c2e; }
+  17.10%, 100.00% { background: transparent; }
+}
+@keyframes d-pair {
+  0.00%, 17.00% { transform: translateY(100%); }
+  19.50%, 34.00% { transform: translateY(0); }
+  36.50%, 100.00% { transform: translateY(100%); }
+}
+@keyframes d-msg-a {
+  0.00%, 30.95% { opacity: 1; }
+  31.00%, 100.00% { opacity: 0; }
+}
+@keyframes d-msg-b {
+  0.00%, 30.95% { opacity: 0; }
+  31.00%, 100.00% { opacity: 1; }
+}
+@keyframes d-ring {
+  0.00%, 21.50% { left: 71px; opacity: 1; }
+  21.55%, 24.00% { left: 139px; opacity: 1; }
+  24.05%, 26.50% { left: 207px; opacity: 1; }
+  26.55%, 29.00% { left: 275px; opacity: 1; }
+  29.05%, 100.00% { left: 275px; opacity: 0; }
+}
+@keyframes d-d1 {
+  0.00%, 21.50% { opacity: 0; }
+  21.55%, 99.00% { opacity: 1; }
+  99.50%, 100.00% { opacity: 0; }
+}
+@keyframes d-k1 {
+  0.00%, 21.35% { background: #2c2c2e; }
+  21.50%, 22.00% { background: #48484a; }
+  22.40%, 100.00% { background: #2c2c2e; }
+}
+@keyframes d-d2 {
+  0.00%, 24.00% { opacity: 0; }
+  24.05%, 99.00% { opacity: 1; }
+  99.50%, 100.00% { opacity: 0; }
+}
+@keyframes d-k2 {
+  0.00%, 23.85% { background: #2c2c2e; }
+  24.00%, 24.50% { background: #48484a; }
+  24.90%, 100.00% { background: #2c2c2e; }
+}
+@keyframes d-d3 {
+  0.00%, 26.50% { opacity: 0; }
+  26.55%, 99.00% { opacity: 1; }
+  99.50%, 100.00% { opacity: 0; }
+}
+@keyframes d-k3 {
+  0.00%, 26.35% { background: #2c2c2e; }
+  26.50%, 27.00% { background: #48484a; }
+  27.40%, 100.00% { background: #2c2c2e; }
+}
+@keyframes d-d4 {
+  0.00%, 29.00% { opacity: 0; }
+  29.05%, 99.00% { opacity: 1; }
+  99.50%, 100.00% { opacity: 0; }
+}
+@keyframes d-k4 {
+  0.00%, 28.85% { background: #2c2c2e; }
+  29.00%, 29.50% { background: #48484a; }
+  29.90%, 100.00% { background: #2c2c2e; }
+}
+@keyframes d-finger {
+  0.00% { left: 224px; top: 546px; opacity: 0; transform: scale(1); }
+  4.75% { left: 224px; top: 546px; opacity: 0; transform: scale(1); }
+  5.35% { left: 224px; top: 546px; opacity: 1; }
+  5.70% { left: 224px; top: 546px; transform: scale(1); }
+  6.00% { left: 224px; top: 546px; transform: scale(.8); }
+  6.50% { left: 224px; top: 546px; transform: scale(1); }
+  6.60% { left: 224px; top: 546px; opacity: 0; transform: scale(1); }
+  14.75% { left: 150px; top: 646px; opacity: 0; transform: scale(1); }
+  15.35% { left: 150px; top: 646px; opacity: 1; }
+  15.70% { left: 150px; top: 646px; transform: scale(1); }
+  16.00% { left: 150px; top: 646px; transform: scale(.8); }
+  16.50% { left: 150px; top: 646px; transform: scale(1); }
+  17.10% { left: 150px; top: 646px; opacity: 0; transform: scale(1); }
+  20.25% { left: 285px; top: 430px; opacity: 0; transform: scale(1); }
+  20.85% { left: 285px; top: 430px; opacity: 1; }
+  21.20% { left: 285px; top: 430px; transform: scale(1); }
+  21.50% { left: 285px; top: 430px; transform: scale(.8); }
+  22.00% { left: 285px; top: 430px; transform: scale(1); }
+  22.10% { left: 285px; top: 430px; }
+  23.50% { left: 179px; top: 618px; transform: scale(1); }
+  24.00% { left: 179px; top: 618px; transform: scale(.8); }
+  24.50% { left: 179px; top: 618px; transform: scale(1); opacity: 1; }
+  26.00% { left: 73px; top: 430px; transform: scale(1); }
+  26.50% { left: 73px; top: 430px; transform: scale(.8); }
+  27.00% { left: 73px; top: 430px; transform: scale(1); opacity: 1; }
+  28.50% { left: 179px; top: 524px; transform: scale(1); }
+  29.00% { left: 179px; top: 524px; transform: scale(.8); }
+  29.50% { left: 179px; top: 524px; transform: scale(1); opacity: 1; }
+  30.25% { left: 179px; top: 524px; opacity: 0; transform: scale(1); }
+  37.40% { left: 88px; top: 363px; opacity: 0; }
+  38.00% { left: 88px; top: 363px; opacity: 1; }
+  42.50% { left: 278px; top: 363px; opacity: 1; }
+  43.10% { left: 278px; top: 363px; opacity: 0; }
+  44.90% { left: 278px; top: 403px; opacity: 0; }
+  45.50% { left: 278px; top: 403px; opacity: 1; }
+  50.00% { left: 88px; top: 403px; opacity: 1; }
+  50.60% { left: 88px; top: 403px; opacity: 0; }
+  51.75% { left: 179px; top: 383px; opacity: 0; transform: scale(1); }
+  52.35% { left: 179px; top: 383px; opacity: 1; }
+  52.70% { left: 179px; top: 383px; transform: scale(1); }
+  53.00% { left: 179px; top: 383px; transform: scale(.8); }
+  53.50% { left: 179px; top: 383px; transform: scale(1); }
+  54.10% { left: 179px; top: 383px; opacity: 0; transform: scale(1); }
+  61.40% { left: 179px; top: -4px; opacity: 0; }
+  62.00% { left: 179px; top: -4px; opacity: 1; }
+  65.50% { left: 179px; top: 278px; opacity: 1; }
+  66.10% { left: 179px; top: 278px; opacity: 0; }
+  69.00% { left: 83px; top: 194px; opacity: 0; transform: scale(1); }
+  69.60% { left: 83px; top: 194px; opacity: 1; }
+  70.70% { left: 83px; top: 194px; transform: scale(1); }
+  71.00% { left: 83px; top: 194px; transform: scale(.8); }
+  71.50% { left: 83px; top: 194px; transform: scale(1); }
+  72.10% { left: 83px; top: 194px; opacity: 0; transform: scale(1); }
+  77.90% { left: 88px; top: 383px; opacity: 0; }
+  78.50% { left: 88px; top: 383px; opacity: 1; }
+  82.50% { left: 278px; top: 383px; opacity: 1; }
+  83.10% { left: 278px; top: 383px; opacity: 0; }
+  100.00% { left: 278px; top: 383px; opacity: 0; transform: scale(1); }
+}
+@keyframes d-glow {
+  0.00% { left: 90px; top: 265px; opacity: 0; }
+  37.40% { left: 90px; top: 265px; opacity: 0; }
+  38.00% { left: 90px; top: 265px; opacity: 1; }
+  42.50% { left: 280px; top: 265px; opacity: 1; }
+  43.50% { left: 280px; top: 265px; opacity: 0; }
+  44.90% { left: 280px; top: 305px; opacity: 0; }
+  45.50% { left: 280px; top: 305px; opacity: 1; }
+  50.00% { left: 90px; top: 305px; opacity: 1; }
+  51.00% { left: 90px; top: 305px; opacity: 0; }
+  51.90% { left: 181px; top: 260px; opacity: 0; }
+  52.50% { left: 181px; top: 260px; opacity: 0.8; }
+  53.50% { left: 181px; top: 260px; opacity: 0.8; }
+  54.50% { left: 181px; top: 260px; opacity: 0; }
+  77.90% { left: 90px; top: 285px; opacity: 0; }
+  78.50% { left: 90px; top: 285px; opacity: 1; }
+  82.50% { left: 280px; top: 285px; opacity: 1; }
+  83.50% { left: 280px; top: 285px; opacity: 0; }
+  100.00% { left: 280px; top: 260px; opacity: 0; }
+}
+@keyframes d-qs {
+  0.00%, 62.00% { transform: translateY(-105%); }
+  65.50%, 72.25% { transform: translateY(0); }
+  74.25%, 100.00% { transform: translateY(-105%); }
+}
+@keyframes d-qs-scrim {
+  0.00%, 62.00% { opacity: 0; }
+  65.50%, 72.25% { opacity: 1; }
+  74.25%, 100.00% { opacity: 0; }
+}
+@keyframes d-tile {
+  0.00%, 70.85% { background: #e1e3e8; }
+  71.10%, 72.00% { background: #c9ccd3; }
+  72.50%, 100.00% { background: #e1e3e8; }
+}
+@keyframes d-bar {
+  0.00%, 62.25% { color: #fff; }
+  63.75%, 73.00% { color: #1f1f1f; }
+  74.00%, 100.00% { color: #fff; }
+}
+
+
+/* The top bar's mode button (the moon, as in dark mode). */
+.demo .mode { left: 20px; top: 54px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+
+/* Without motion: just the remote. */
+@media (prefers-reduced-motion: reduce) {
+  .demo .home, .demo .sheet, .demo .scrim, .demo .pair, .demo .finger, .demo .glow, .demo .name.a, .demo .qs, .demo .qs-scrim { display: none; }
+  .demo .app, .demo .name.b { animation: none; opacity: 1; transform: none; clip-path: none; }
+  .demo .bar { animation: none; color: #fff; }
+}
